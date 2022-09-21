@@ -12,11 +12,13 @@ import { Text } from 'react-native';
 import logoImg from '../../assets/logo-nlw-esports.png';
 import { Background } from '../../components/Background';
 import { DuoCard, DuoCardProps } from '../../components/DuoCard';
+import { DuoMatch } from '../../components/DuoMatch';
 import { Heading } from '../../components/Heading';
 
 
 export function Game() {
   const [duos, setDuos] = useState<DuoCardProps[]>([])
+  const [discordDuoSelected, setDiscordDuoSelected] = useState('')
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -24,6 +26,12 @@ export function Game() {
 
   function handleGoBack() {
     navigation.goBack();
+  }
+
+  async function getDiscordUser(adsId: string) {
+    fetch(`http://192.168.100.12:3333/ads/${adsId}/discord`)
+      .then(response => response.json())
+      .then(data => setDiscordDuoSelected(data.discordId))
   }
 
   useEffect(() => {
@@ -68,7 +76,7 @@ export function Game() {
           renderItem={({ item }) => (
             <DuoCard
               data={item}
-              onConnect={() => { }}
+              onConnect={() => getDiscordUser(item.id)}
             />
           )}
           horizontal
@@ -81,6 +89,14 @@ export function Game() {
             </Text>
           )}
         />
+
+        <DuoMatch
+          visible={discordDuoSelected.length > 0}
+          discordId={discordDuoSelected}
+          onClose={() => setDiscordDuoSelected('')}
+        >
+
+        </DuoMatch>
 
 
       </SafeAreaView>
